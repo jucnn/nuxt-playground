@@ -21,16 +21,43 @@
       </b-collapse>
     </div>
     <div class="filters-container">
-      <div class="filters-importance">
-        <h3 class="title is-3">Filtres</h3>
-        <b-field label="Importance">
-          <b-select v-model="importanceSelected" id="importanceSelected">
-            <option value="all">Tous</option>
-            <option value="yellow">Jaune</option>
-            <option value="orange">Orange</option>
-            <option value="red">Rouge</option>
-          </b-select>
-        </b-field>
+      <h3 class="title is-3">Filtres</h3>
+      <div class="filters-content">
+        <div class="filters-item filters-importance">
+          <b-field label="Importance">
+            <b-select v-model="importanceSelected" id="importanceSelected">
+              <option value="all">Tous</option>
+              <option value="yellow">Jaune</option>
+              <option value="orange">Orange</option>
+              <option value="red">Rouge</option>
+            </b-select>
+          </b-field>
+        </div>
+        <div class="filters-item filters-date">
+          <b-field label="Trier par :">
+            <select v-model="orderedSelected" @change="orderedBy($event)">
+              <option
+                v-for="option in orderedType"
+                :value="option.value"
+                :key="option.value"
+              >
+                {{ option.text }}
+              </option>
+            </select>
+            <!--  <b-select v-model="orderedType" v-on:click="orderedBy()" id="orderedType">
+              <option value="creationDate">Date de création</option>
+              <option value="endedDate">Date de fin</option>
+              <option value="alphabetic">Ordre alphabétique</option>
+            </b-select> -->
+          </b-field>
+        </div>
+        <!-- <div class="filters-item filters-date">
+          <b-field label="Trier par :">
+            <b-button @click="this.orderedBy">Date de création</b-button>
+            <b-button>Date de fin</b-button>
+            <b-button>Ordre alphabétique</b-button>
+          </b-field>
+        </div> -->
       </div>
     </div>
     <div class="card-container">
@@ -79,24 +106,21 @@ export default {
           title: "Faire la vaisselle",
           description: "Je dois faire la vaisselle, c'est important",
           importance: "orange",
-          date: new Date(),
-          completed: false,
+          date: new Date("December 4, 2020 03:24:00"),
         },
         {
           id: 2,
           title: "Laver la SDB",
           description: "Je dois laver la SDB, c'est important",
           importance: "yellow",
-          date: new Date(),
-          completed: false,
+          date: new Date("December 5, 2020 03:24:00"),
         },
         {
           id: 3,
           title: "Finir la todo liste",
           description: "Je dois la finir rapidement",
           importance: "red",
-          date: new Date(),
-          completed: false,
+          date: new Date("December 3, 2020 03:24:00"),
         },
       ],
       updating: false,
@@ -106,12 +130,17 @@ export default {
         description: "",
         importance: "",
         date: new Date(),
-        completed: false,
       },
       todoUpdated: Object,
       isCreationOpen: false,
       open: false,
       importanceSelected: "all",
+      orderedSelected: "creationDate",
+      orderedType: [
+        { text: "Par date de création", value: "creationDate" },
+        { text: "Date de fin", value: "endedDate" },
+        { text: "Ordre alphabétique", value: "alphabetic" },
+      ],
     };
   },
   computed: {
@@ -126,6 +155,28 @@ export default {
     },
   },
   methods: {
+    orderedBy(event) {
+      if (event.target.value.includes("endedDate")) {
+        this.todos = this.todos.sort((a, b) => {
+          return a.date > b.date;
+        });
+      } else if (event.target.value.includes("alphabetic")) {
+        this.todos = this.todos.sort((a, b) => {
+          if (a.title < b.title) {
+            return -1;
+          }
+          if (a.title > b.title) {
+            return 1;
+          }
+          return 0;
+        });
+      } else {
+        this.todos = this.todos.sort((a, b) => {
+          return a.id - b.id;
+        });
+      }
+    },
+
     addTodo(item) {
       console.log(item);
       if (item.title && item.description && item.importance) {
@@ -158,8 +209,12 @@ export default {
 </script>
 
 <style>
-.filters-container {
+.filters-content {
   margin-top: 30px;
+  display: flex;
+}
+.filters-item {
+  margin-right: 30px;
 }
 .card-container {
   display: grid;
