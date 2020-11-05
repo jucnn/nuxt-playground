@@ -16,16 +16,28 @@
           <strong>Ajouter une tache</strong>
         </div>
         <div class="todo-add_content">
-          <TodoForm :todo="todoDefault" @addTodoEvent="addTodo" :add="true"/>
-
+          <TodoForm :todo="todoDefault" @addTodoEvent="addTodo" :add="true" />
         </div>
       </b-collapse>
+    </div>
+    <div class="filters-container">
+      <div class="filters-importance">
+        <h3 class="title is-3">Filtres</h3>
+        <b-field label="Importance">
+          <b-select v-model="importanceSelected" id="importanceSelected">
+            <option value="all">Tous</option>
+            <option value="yellow">Jaune</option>
+            <option value="orange">Orange</option>
+            <option value="red">Rouge</option>
+          </b-select>
+        </b-field>
+      </div>
     </div>
     <div class="card-container">
       <TodoItem
         @deleteTodoEvent="deleteTodo"
         @editTodoEvent="editTodo"
-        v-for="todo in todos"
+        v-for="todo in filterByImportance"
         :key="todo.id"
         :todo="todo"
       ></TodoItem>
@@ -37,7 +49,11 @@
         aria-role="dialog"
         aria-modal
       >
-        <TodoItemEdit :todo="todoUpdated" @saveTodoEvent="saveTodo"></TodoItemEdit>
+        <TodoItemEdit
+          :todo="todoUpdated"
+          @saveTodoEvent="saveTodo"
+          @close="open = false"
+        ></TodoItemEdit>
       </b-modal>
     </div>
   </section>
@@ -53,7 +69,7 @@ export default {
   components: {
     TodoItem,
     TodoItemEdit,
-    TodoForm
+    TodoForm,
   },
   data() {
     return {
@@ -64,7 +80,7 @@ export default {
           description: "Je dois faire la vaisselle, c'est important",
           importance: "orange",
           date: new Date(),
-          completed: false
+          completed: false,
         },
         {
           id: 2,
@@ -72,7 +88,7 @@ export default {
           description: "Je dois laver la SDB, c'est important",
           importance: "yellow",
           date: new Date(),
-          completed: false
+          completed: false,
         },
         {
           id: 3,
@@ -80,8 +96,8 @@ export default {
           description: "Je dois la finir rapidement",
           importance: "red",
           date: new Date(),
-          completed: false
-        }
+          completed: false,
+        },
       ],
       updating: false,
       todoDefault: {
@@ -90,11 +106,24 @@ export default {
         description: "",
         importance: "",
         date: new Date(),
-        completed: false
+        completed: false,
       },
       todoUpdated: Object,
-      isCreationOpen: false
+      isCreationOpen: false,
+      open: false,
+      importanceSelected: "all",
     };
+  },
+  computed: {
+    filterByImportance() {
+      if (this.importanceSelected != "all") {
+        return this.todos.filter((todo) => {
+          return todo.importance.includes(this.importanceSelected);
+        });
+      } else {
+        return this.todos;
+      }
+    },
   },
   methods: {
     addTodo(item) {
@@ -105,7 +134,7 @@ export default {
           title: item.title,
           description: item.description,
           importance: item.importance,
-          date: item.date
+          date: item.date,
         });
       } else {
         console.log("error");
@@ -119,69 +148,19 @@ export default {
     },
     editTodo(item) {
       this.updating = true;
-      this.todoUpdated = item
+      this.todoUpdated = item;
     },
     saveTodo() {
-      console.log(this.todoUpdated)
-    }
-  }
+      console.log(this.todoUpdated);
+    },
+  },
 };
 </script>
 
 <style>
-.todo-add {
-  margin-top: 10px;
-  border-radius: 5px;
-  max-width: 500px;
-}
-
-.todo-add_title {
-  padding: 15px;
-  background-color: #dfdfdf;
-}
-
-.todo-add_content {
-  padding: 20px;
-  background-color: #f2f2f2;
-}
-
-.todo-add_button {
+.filters-container {
   margin-top: 30px;
 }
-
-.todo-add_importance {
-  display: flex;
-  justify-content: space-around;
-}
-
-.todo-add_importance input {
-  display: none;
-}
-
-.todo-add_importance input:checked + label span {
-  border: 2px solid #363636;
-}
-
-.todo-add_importance label span {
-  width: 40px;
-  height: 40px;
-  display: inline-block;
-  border-radius: 100%;
-  cursor: pointer;
-}
-
-.todo-add_importance--yellow {
-  background-color: #fff971;
-}
-
-.todo-add_importance--orange {
-  background-color: #ff8b00;
-}
-
-.todo-add_importance--red {
-  background-color: #ff0000;
-}
-
 .card-container {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -190,3 +169,4 @@ export default {
   margin-top: 60px;
 }
 </style>
+
