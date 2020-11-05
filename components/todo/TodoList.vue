@@ -26,16 +26,22 @@
         <div class="filters-item filters-importance">
           <b-field label="Importance">
             <b-select v-model="importanceSelected" id="importanceSelected">
-              <option value="all">Tous</option>
-              <option value="yellow">Jaune</option>
-              <option value="orange">Orange</option>
-              <option value="red">Rouge</option>
+              <option
+                v-for="importance in importanceType"
+                :key="importance.value"
+                :value="importance.value"
+              >
+                {{ importance.text }}
+              </option>
             </b-select>
           </b-field>
         </div>
         <div class="filters-item filters-date">
           <b-field label="Trier par :">
-            <select v-model="orderedSelected" @change="orderedBy($event)">
+            <b-select
+              v-model="orderedSelected"
+              @change.native="orderedBy($event)"
+            >
               <option
                 v-for="option in orderedType"
                 :value="option.value"
@@ -43,21 +49,9 @@
               >
                 {{ option.text }}
               </option>
-            </select>
-            <!--  <b-select v-model="orderedType" v-on:click="orderedBy()" id="orderedType">
-              <option value="creationDate">Date de création</option>
-              <option value="endedDate">Date de fin</option>
-              <option value="alphabetic">Ordre alphabétique</option>
-            </b-select> -->
+            </b-select>
           </b-field>
         </div>
-        <!-- <div class="filters-item filters-date">
-          <b-field label="Trier par :">
-            <b-button @click="this.orderedBy">Date de création</b-button>
-            <b-button>Date de fin</b-button>
-            <b-button>Ordre alphabétique</b-button>
-          </b-field>
-        </div> -->
       </div>
     </div>
     <div class="card-container">
@@ -83,6 +77,9 @@
         ></TodoItemEdit>
       </b-modal>
     </div>
+    <div>
+      {{ allTodos }}
+    </div>
   </section>
 </template>
 
@@ -90,6 +87,7 @@
 import TodoItem from "@/components/todo/TodoItem";
 import TodoItemEdit from "@/components/todo/TodoItemEdit";
 import TodoForm from "@/components/todo/TodoForm";
+import { mapGetters, mapMutations } from "vuex";
 
 export default {
   name: "TodoList",
@@ -123,7 +121,6 @@ export default {
           date: new Date("December 3, 2020 03:24:00"),
         },
       ],
-      updating: false,
       todoDefault: {
         id: Number,
         title: "",
@@ -131,10 +128,17 @@ export default {
         importance: "",
         date: new Date(),
       },
+      updating: false,
       todoUpdated: Object,
       isCreationOpen: false,
       open: false,
       importanceSelected: "all",
+      importanceType: [
+        { text: "Tous", value: "all" },
+        { text: "Jaune", value: "yellow" },
+        { text: "Orange", value: "orange" },
+        { text: "Rouge", value: "red" },
+      ],
       orderedSelected: "creationDate",
       orderedType: [
         { text: "Par date de création", value: "creationDate" },
@@ -144,13 +148,16 @@ export default {
     };
   },
   computed: {
+    ...mapGetters({
+      allTodos: "todos/getAllTodos",
+    }),
     filterByImportance() {
       if (this.importanceSelected != "all") {
-        return this.todos.filter((todo) => {
+        return this.allTodos.filter((todo) => {
           return todo.importance.includes(this.importanceSelected);
         });
       } else {
-        return this.todos;
+        return this.allTodos;
       }
     },
   },
@@ -176,17 +183,19 @@ export default {
         });
       }
     },
-
+        ...mapMutations({
+      addTodoMutation: "todos/addTodo",
+    }),
     addTodo(item) {
-      console.log(item);
       if (item.title && item.description && item.importance) {
-        this.todos.push({
-          id: this.todos.length + 1,
+        const payload = {
+          id: this.allTodos.length + 1,
           title: item.title,
           description: item.description,
           importance: item.importance,
           date: item.date,
-        });
+        };
+        this.addTodoMutation(payload);
       } else {
         console.log("error");
       }
