@@ -1,17 +1,17 @@
 <template>
   <div>
     <b-field label="Titre">
-      <b-input v-model="todo.title" type="text" />
+      <b-input v-model="newOrUpdateTodo.title" type="text" />
     </b-field>
     <b-field label="Description">
-      <b-input v-model="todo.description" type="text" />
+      <b-input v-model="newOrUpdateTodo.description" type="text" />
     </b-field>
     <b-field label="Importance">
       <div v-if="add" class="todo-add_importance">
         <div class="todo-add_importance-input">
           <input
             type="radio"
-            v-model="todo.importance"
+            v-model="newOrUpdateTodo.importance"
             id="yellow"
             value="yellow"
           />
@@ -22,7 +22,7 @@
         <div class="todo-add_importance-input">
           <input
             type="radio"
-            v-model="todo.importance"
+            v-model="newOrUpdateTodo.importance"
             id="orange"
             value="orange"
           />
@@ -31,7 +31,12 @@
           </label>
         </div>
         <div class="todo-add_importance-input">
-          <input type="radio" v-model="todo.importance" id="red" value="red" />
+          <input
+            type="radio"
+            v-model="newOrUpdateTodo.importance"
+            id="red"
+            value="red"
+          />
           <label for="red">
             <span class="todo-add_importance--red"></span>
           </label>
@@ -41,7 +46,7 @@
         <div class="todo-add_importance-input">
           <input
             type="radio"
-            v-model="todo.importance"
+            v-model="newOrUpdateTodo.importance"
             id="yellow-2"
             value="yellow"
           />
@@ -52,7 +57,7 @@
         <div class="todo-add_importance-input">
           <input
             type="radio"
-            v-model="todo.importance"
+            v-model="newOrUpdateTodo.importance"
             id="orange-2"
             value="orange"
           />
@@ -63,7 +68,7 @@
         <div class="todo-add_importance-input">
           <input
             type="radio"
-            v-model="todo.importance"
+            v-model="newOrUpdateTodo.importance"
             id="red-2"
             value="red"
           />
@@ -75,7 +80,7 @@
     </b-field>
     <b-field label="Date">
       <b-datepicker
-        v-model="todo.date"
+        v-model="newOrUpdateTodo.date"
         placeholder="Cliquez pour sélectionner une date..."
         icon="calendar-today"
         trap-focus
@@ -92,54 +97,35 @@
     <b-button v-if="edit" @click="saveTodo" class="is-success" expanded
       >Sauvegarder</b-button
     >
+    {{ newOrUpdateTodo }}
   </div>
 </template>
 
 <script>
-/* import dayjs from "dayjs";
- */
 export default {
   name: "TodoForm",
   props: {
     todo: Object,
     add: false,
-    edit: false
+    edit: false,
   },
-  data() {
-    return {
-      showWeekNumber: false,
-      locale: undefined
-    };
+  computed: {
+    newOrUpdateTodo() {
+      return Object.assign({}, this.todo);
+    },
   },
   methods: {
     addTodo(event) {
-      this.$emit("addTodoEvent", this.todo);
+      this.$emit("addTodoEvent", this.newOrUpdateTodo);
     },
     saveTodo(event) {
-      this.$emit("saveTodoEvent");
-      this.$emit("close");
-    }
-  }
+      this.$emit("saveTodoEvent", this.newOrUpdateTodo);
+    },
+  },
 };
 </script>
 
 <style>
-.todo-add {
-  margin-top: 10px;
-  border-radius: 5px;
-  max-width: 500px;
-}
-
-.todo-add_title {
-  padding: 15px;
-  background-color: #dfdfdf;
-}
-
-.todo-add_content {
-  padding: 20px;
-  background-color: #f2f2f2;
-}
-
 .todo-add_button {
   margin-top: 30px;
 }

@@ -19,6 +19,13 @@
           <TodoForm :todo="todoDefault" @addTodoEvent="addTodo" :add="true" />
         </div>
       </b-collapse>
+      <b-notification
+        v-if="todoCreated"
+        type="is-success is-light"
+        aria-close-label="Close notification"
+      >
+        Todo créée
+      </b-notification>
     </div>
     <div class="filters-container">
       <h3 class="title is-3">Filtres</h3>
@@ -56,7 +63,7 @@
     </div>
     <div class="card-container">
       <TodoItem
-        @deleteTodoEvent="deleteTodo"
+        @deleteTodoEvent="deleteTodoMutation(todo)"
         @editTodoEvent="editTodo"
         v-for="todo in filterByImportance"
         :key="todo.id"
@@ -77,9 +84,6 @@
         ></TodoItemEdit>
       </b-modal>
     </div>
-    <div>
-      {{ allTodos }}
-    </div>
   </section>
 </template>
 
@@ -98,29 +102,6 @@ export default {
   },
   data() {
     return {
-      todos: [
-        {
-          id: 1,
-          title: "Faire la vaisselle",
-          description: "Je dois faire la vaisselle, c'est important",
-          importance: "orange",
-          date: new Date("December 4, 2020 03:24:00"),
-        },
-        {
-          id: 2,
-          title: "Laver la SDB",
-          description: "Je dois laver la SDB, c'est important",
-          importance: "yellow",
-          date: new Date("December 5, 2020 03:24:00"),
-        },
-        {
-          id: 3,
-          title: "Finir la todo liste",
-          description: "Je dois la finir rapidement",
-          importance: "red",
-          date: new Date("December 3, 2020 03:24:00"),
-        },
-      ],
       todoDefault: {
         id: Number,
         title: "",
@@ -132,6 +113,7 @@ export default {
       todoUpdated: Object,
       isCreationOpen: false,
       open: false,
+      todoCreated: false,
       importanceSelected: "all",
       importanceType: [
         { text: "Tous", value: "all" },
@@ -164,11 +146,11 @@ export default {
   methods: {
     orderedBy(event) {
       if (event.target.value.includes("endedDate")) {
-        this.todos = this.todos.sort((a, b) => {
+        this.allTodos = this.allTodos.sort((a, b) => {
           return a.date > b.date;
         });
       } else if (event.target.value.includes("alphabetic")) {
-        this.todos = this.todos.sort((a, b) => {
+        this.allTodos = this.allTodos.sort((a, b) => {
           if (a.title < b.title) {
             return -1;
           }
@@ -178,13 +160,15 @@ export default {
           return 0;
         });
       } else {
-        this.todos = this.todos.sort((a, b) => {
+        this.allTodos = this.allTodos.sort((a, b) => {
           return a.id - b.id;
         });
       }
     },
-        ...mapMutations({
+    ...mapMutations({
       addTodoMutation: "todos/addTodo",
+      updateTodoMutation: "todos/updateTodo",
+      deleteTodoMutation: "todos/deleteTodo"
     }),
     addTodo(item) {
       if (item.title && item.description && item.importance) {
@@ -196,24 +180,29 @@ export default {
           date: item.date,
         };
         this.addTodoMutation(payload);
+        this.todoDefault = {
+          id: Number,
+          title: "",
+          description: "",
+          importance: "",
+          date: new Date(),
+        };
+        this.isCreationOpen = false;
+        this.todoCreated = true;
       } else {
         console.log("error");
       }
-    },
-    deleteTodo(item) {
-      var index = this.todos.indexOf(item);
-      this.todos.splice(index, 1);
-      /*       this.todos = this.todos.filter(todo => todo.id !== id);
-       */
     },
     editTodo(item) {
       this.updating = true;
       this.todoUpdated = item;
     },
-    saveTodo() {
-      console.log(this.todoUpdated);
+    saveTodo(item) {
+      this.updating = false;
+      this.updateTodoMutation(item)
     },
   },
+
 };
 </script>
 
@@ -231,6 +220,28 @@ export default {
   grid-auto-columns: 300px;
   gap: 10px 10px;
   margin-top: 60px;
+}
+
+.todo-add_container {
+  margin-bottom: 20px;
+  max-width: 500px;
+}
+.todo-add_container .b-notification {
+  margin: 20px 0;
+}
+.todo-add {
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
+.todo-add_title {
+  padding: 15px;
+  background-color: #dfdfdf;
+}
+
+.todo-add_content {
+  padding: 20px;
+  background-color: #f2f2f2;
 }
 </style>
 

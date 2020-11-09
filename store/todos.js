@@ -20,21 +20,47 @@ const state = {
       importance: "red",
       date: new Date("December 3, 2020 03:24:00"),
     },
+  ],
+  importance: [{
+      text: "Tous",
+      value: "all"
+    },
+    {
+      text: "Jaune",
+      value: "yellow"
+    },
+    {
+      text: "Orange",
+      value: "orange"
+    },
+    {
+      text: "Rouge",
+      value: "red"
+    }, ,
   ]
 }
 
 const getters = {
-  getAllTodos: state => state.todos
+  getAllTodos: state => state.todos,
+  getAllImportance: state => state.importance,
+
 }
 
 const mutations = {
   setAllTodos(state, todos) {
     state.todos = todos
   },
-  addTodo: (state, data) => {
+  addTodo(state, data) {
     state.todos.push(data)
+  },
+  updateTodo(state, data) {
+    console.log(data)
+    const index = state.todos.findIndex(item => item.id === data.id);
+    state.todos[index] = data
+  },
+  deleteTodo(state, item) {
+    state.todos.splice(state.todos.indexOf(item), 1)
   }
-
 }
 
 const actions = {
