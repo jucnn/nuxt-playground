@@ -1,4 +1,4 @@
-const state = {
+const state = () => ({
   todos: [{
       id: 1,
       title: "Faire la vaisselle",
@@ -36,14 +36,27 @@ const state = {
     {
       text: "Rouge",
       value: "red"
-    }, ,
+    }
+  ],
+  orderedType: [{
+      text: "Par date de création",
+      value: "creationDate"
+    },
+    {
+      text: "Date de fin",
+      value: "endedDate"
+    },
+    {
+      text: "Ordre alphabétique",
+      value: "alphabetic"
+    },
   ]
-}
+})
 
 const getters = {
   getAllTodos: state => state.todos,
   getAllImportance: state => state.importance,
-
+  getAllOrderedType: state => state.orderedType,
 }
 
 const mutations = {

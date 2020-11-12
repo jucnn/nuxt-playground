@@ -31,12 +31,7 @@
           </label>
         </div>
         <div class="todo-add_importance-input">
-          <input
-            type="radio"
-            v-model="newOrUpdateTodo.importance"
-            id="red"
-            value="red"
-          />
+          <input type="radio" v-model="newOrUpdateTodo.importance" id="red" value="red" />
           <label for="red">
             <span class="todo-add_importance--red"></span>
           </label>
@@ -47,10 +42,10 @@
           <input
             type="radio"
             v-model="newOrUpdateTodo.importance"
-            id="yellow-2"
+            id="yellow-edit"
             value="yellow"
           />
-          <label for="yellow-2">
+          <label for="yellow-edit">
             <span class="todo-add_importance--yellow"></span>
           </label>
         </div>
@@ -58,10 +53,10 @@
           <input
             type="radio"
             v-model="newOrUpdateTodo.importance"
-            id="orange-2"
+            id="orange-edit"
             value="orange"
           />
-          <label for="orange-2">
+          <label for="orange-edit">
             <span class="todo-add_importance--orange"></span>
           </label>
         </div>
@@ -69,10 +64,10 @@
           <input
             type="radio"
             v-model="newOrUpdateTodo.importance"
-            id="red-2"
+            id="red-edit"
             value="red"
           />
-          <label for="red-2">
+          <label for="red-edit">
             <span class="todo-add_importance--red"></span>
           </label>
         </div>
@@ -97,7 +92,6 @@
     <b-button v-if="edit" @click="saveTodo" class="is-success" expanded
       >Sauvegarder</b-button
     >
-    {{ newOrUpdateTodo }}
   </div>
 </template>
 
@@ -109,10 +103,11 @@ export default {
     add: false,
     edit: false,
   },
-  computed: {
-    newOrUpdateTodo() {
-      return Object.assign({}, this.todo);
-    },
+  data() {
+    return {
+      newOrUpdateTodo: {},
+      inputName: "",
+    };
   },
   methods: {
     addTodo(event) {
@@ -121,6 +116,12 @@ export default {
     saveTodo(event) {
       this.$emit("saveTodoEvent", this.newOrUpdateTodo);
     },
+    getNewOrUpdateTodo() {
+      this.newOrUpdateTodo = Object.assign({}, this.todo);
+    }
+  },
+  mounted() {
+    this.getNewOrUpdateTodo()
   },
 };
 </script>

@@ -6,7 +6,7 @@
           <p class="modal-card-title">Modifier le todo</p>
         </header>
         <section class="modal-card-body">
-          <TodoForm :todo="todo" :edit="true" v-on="$listeners"> </TodoForm>
+          <TodoForm :todo="todo" :edit="true" :add="false" v-on="$listeners"> </TodoForm>
         </section>
       </div>
     </modal-form>

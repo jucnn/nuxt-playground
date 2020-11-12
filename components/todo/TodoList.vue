@@ -16,7 +16,7 @@
           <strong>Ajouter une tache</strong>
         </div>
         <div class="todo-add_content">
-          <TodoForm :todo="todoDefault" @addTodoEvent="addTodo" :add="true" />
+          <TodoForm :todo="todoDefault" @addTodoEvent="addTodo" :add="true" :edit="false" />
         </div>
       </b-collapse>
       <b-notification
@@ -34,7 +34,7 @@
           <b-field label="Importance">
             <b-select v-model="importanceSelected" id="importanceSelected">
               <option
-                v-for="importance in importanceType"
+                v-for="importance in allImportance"
                 :key="importance.value"
                 :value="importance.value"
               >
@@ -50,7 +50,7 @@
               @change.native="orderedBy($event)"
             >
               <option
-                v-for="option in orderedType"
+                v-for="option in allOrderedType"
                 :value="option.value"
                 :key="option.value"
               >
@@ -115,23 +115,14 @@ export default {
       open: false,
       todoCreated: false,
       importanceSelected: "all",
-      importanceType: [
-        { text: "Tous", value: "all" },
-        { text: "Jaune", value: "yellow" },
-        { text: "Orange", value: "orange" },
-        { text: "Rouge", value: "red" },
-      ],
       orderedSelected: "creationDate",
-      orderedType: [
-        { text: "Par date de création", value: "creationDate" },
-        { text: "Date de fin", value: "endedDate" },
-        { text: "Ordre alphabétique", value: "alphabetic" },
-      ],
     };
   },
   computed: {
     ...mapGetters({
       allTodos: "todos/getAllTodos",
+      allImportance: "todos/getAllImportance",
+      allOrderedType: "todos/getAllOrderedType"
     }),
     filterByImportance() {
       if (this.importanceSelected != "all") {
